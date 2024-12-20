@@ -1,133 +1,148 @@
-import React, { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import Navbar from "./Navbar";
-import ecoCoinABI from '../EcoCoin.json'; // Import the ABI from the saved JSON file
+import React, { useState } from "react";
+import axios from "axios";
 
-export default function AddCarbonFootprint() {
-    const [carbonEmissions, setCarbonEmissions] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
-    const [account, setAccount] = useState(null);
+function App() {
+    const [formData, setFormData] = useState({
+        "Body Type": "",
+        Sex: "",
+        Diet: "",
+        Transport: "",
+        "Vehicle Type": "",
+        "Social Activity": "",
+        "Monthly Grocery Bill": "",
+        "Frequency of Traveling by Air": "",
+        "Vehicle Monthly Distance Km": "",
+        "Waste Bag Size": "",
+        "Waste Bag Weekly Count": "",
+        "How Long TV PC Daily Hour": "",
+        "How Many New Clothes Monthly": "",
+        "How Long Internet Daily Hour": "",
+    });
 
-    const ecoCoinAddress = "0x4bFc065fe49110b38555AbC1A602CE6945501851";  // Confirm this address matches your deployment
-    const ecoCoinContractABI = ecoCoinABI.abi;  // ABI from the JSON file
+    const [prediction, setPrediction] = useState(null);
 
-    // Check for connected account when the component mounts
-    useEffect(() => {
-        if (window.ethereum) {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            provider.listAccounts().then(accounts => {
-                if (accounts.length > 0) {
-                    setAccount(accounts[0]);  // Set the first account if available
-                }
-            });
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-            // Listen for account changes
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length > 0) {
-                    setAccount(accounts[0]);
-                } else {
-                    setAccount(null); // Handle case when account is disconnected
-                }
-            });
-        }
-    }, []);
-
-    const connectWallet = async () => {
-        if (window.ethereum) {
-            try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                const userAccount = await signer.getAddress();
-                setAccount(userAccount);
-            } catch (error) {
-                alert("Wallet connection failed. Please try again.");
-            }
-        } else {
-            alert("Please install MetaMask");
-        }
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
     };
 
-    const handleMintEcoCoin = async () => {
-        if (!carbonEmissions || carbonEmissions <= 0 || isNaN(carbonEmissions)) {
-            alert("Please enter a valid carbon emission amount.");
-            return;
-        }
-
-        if (!account) {
-            alert("Please connect your wallet first.");
-            return;
-        }
-
-        setLoading(true);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        // Log the inputted data
+        console.log("Form Data Submitted:", formData);
+    
         try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const ecoCoinContract = new ethers.Contract(ecoCoinAddress, ecoCoinContractABI, signer);
-
-            // Convert emissions to token decimals (assuming 18 decimals)
-            const tokenAmount = ethers.utils.parseUnits(carbonEmissions.toString(), 18);
-            
-            // Mint tokens to the connected user's address
-            try {
-                const tx = await ecoCoinContract.mint(account, tokenAmount, {
-                    gasLimit: 5000000, // Ensure this is a higher limit
-                    gasPrice: ethers.utils.parseUnits("20", "gwei"), // Set the gas price
-                });
-                console.log("Transaction sent:", tx);
-                await tx.wait();
-                setMessage(`Successfully minted ${carbonEmissions} EcoCoins to your account!`);
-            } catch (error) {
-                console.error("Error occurred during transaction:", error);
-                setMessage(`Error occurred: ${error.message}`);
-            }
-            
-            
-
-            
-        } catch (err) {
-            console.error("Error minting EcoCoin:", err);
-            setMessage(`Error occurred: ${err.message}`);
+            const response = await axios.post("http://192.168.182.61:5000/predict", formData, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            setPrediction(response.data.carbon_footprint);
+        } catch (error) {
+            console.error("Error making prediction:", error.response ? error.response.data : error);
         }
-        setLoading(false);
     };
-
+    
     return (
-        <div className="profileClass" style={{ minHeight: "100vh", color : "white"}}>
-            <Navbar />
-
-            <div className="flex flex-col text-center mt-11 md:text-2xl">
-                <h1 className="font-bold" style={{ color: "white" }}>Mint EcoCoin</h1>
-
-                {account ? (
-                    <div className="mb-5" style={{ color: "white" }}>
-                        <h2 className="font-bold">Connected Account</h2>
-                        <p>{account}</p>
+        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", color: "white", backgroundColor: "#333" }}>
+            <h1>Carbon Footprint Predictor</h1>
+            <form onSubmit={handleSubmit}>
+                {Object.keys(formData).map((key) => (
+                    <div key={key} style={{ marginBottom: "10px" }}>
+                        <label>
+                            {key}:
+                            {key === "Waste Bag Weekly Count" ||
+                              key === "How Long TV PC Daily Hour" ||
+                              key === "How Many New Clothes Monthly" ||
+                              key === "How Long Internet Daily Hour" ||
+                              key === "Monthly Grocery Bill" || 
+                              key === "Vehicle Monthly Distance Km" ? (
+                                <input
+                                    type="number"
+                                    name={key}
+                                    value={formData[key]}
+                                    onChange={handleChange}
+                                    style={{
+                                        marginLeft: "10px",
+                                        padding: "5px",
+                                        color: "black",
+                                        backgroundColor: "white",
+                                        border: "1px solid #ccc",
+                                        borderRadius: "4px",
+                                    }}
+                                />
+                            ) : (
+                                <select
+                                    name={key}
+                                    value={formData[key]}
+                                    onChange={handleChange}
+                                    style={{
+                                        marginLeft: "10px",
+                                        padding: "5px",
+                                        color: "black",
+                                        backgroundColor: "white",
+                                        border: "1px solid #ccc",
+                                        borderRadius: "4px",
+                                    }}
+                                >
+                                    <option value="" disabled>Select {key}</option>
+                                    {key === "Body Type" && ['normal', 'obese', 'overweight', 'underweight'].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                    {key === "Sex" && ["female", "male"].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                    {key === "Diet" && ['omnivore', 'pescatarian', 'vegan', 'vegetarian'].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                    {key === "Transport" && ['private', 'public', 'walk/bicycle'].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                    {key === "Vehicle Type" && ['None', 'diesel', 'electric', 'hybrid', 'lpg', 'petrol'].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                    {key === "Social Activity" && ['never', 'often', 'sometimes'].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                    {key === "Frequency of Traveling by Air" && ['frequently', 'never', 'rarely', 'very frequently'].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                    {key === "Waste Bag Size" && ['extra large', 'large', 'medium', 'small'].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                </select>
+                            )}
+                        </label>
                     </div>
-                ) : (
-                    <button onClick={connectWallet} className="btn-connect">
-                        Connect Wallet
-                    </button>
-                )}
-
-                <div className="mt-10">
-                    <label className="font-bold" style={{ color: "white" }}>Enter Carbon Emissions: </label>
-                    <input
-                        type="number"
-                        value={carbonEmissions}
-                        onChange={(e) => setCarbonEmissions(e.target.value)}
-                        className="input-carbon"
-                        style={{ color: "black" }}
-                    />
-                </div>
-
-                <button onClick={handleMintEcoCoin} disabled={loading} className="btn-mint" style={{ color: "white" }}>
-                    {loading ? "Minting..." : "Mint EcoCoin"}
+                ))}
+                <button
+                    type="submit"
+                    style={{
+                        padding: "10px 20px",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                        backgroundColor: "#007BFF",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                    }}
+                >
+                    Calculate Footprint
                 </button>
-
-                {message && <p className="mt-5">{message}</p>}
-            </div>
+            </form>
+            {prediction !== null && (
+                <div style={{ marginTop: "20px", color: "white" }}>
+                    <h2>Predicted Carbon Footprint:</h2>
+                    <p>{prediction}</p>
+                </div>
+            )}
         </div>
     );
 }
+
+export default App;

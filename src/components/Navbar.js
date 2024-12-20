@@ -99,7 +99,10 @@ function Navbar() {
           Create NFTs
         </Link>
         <Link to="/addCarbonFootprints" style={location.pathname === "/addCarbonFootprints" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
-          Eco Coins
+          Add Carbon Footprints
+        </Link>
+        <Link to="/tradeNFTs" style={location.pathname === "/tradeNFTs" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
+          Trade NFTs
         </Link>
         <Link to="/profile" style={location.pathname === "/profile" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
           Profile
