@@ -1,30 +1,21 @@
-import axie from "../tile.jpeg";
-import {
-    BrowserRouter as Router,
-    Link,
-  } from "react-router-dom";
-  import { GetIpfsUrlFromPinata } from "../utils";
+import { Link } from "react-router-dom";
+import "./NFTCard.css"; // Import the card styles
 
-function NFTTile (data) {
-    const newTo = {
-        pathname:"/nftPage/"+data.data.tokenId
-    }
-
-    const IPFSUrl = GetIpfsUrlFromPinata(data.data.image);
-
+export default function NFTTile({ data, currAddress }) {
     return (
-        <Link to={newTo}>
-        <div className="border-2 ml-12 mt-5 mb-12 flex flex-col items-center rounded-lg w-48 md:w-72 shadow-2xl">
-            <img src={IPFSUrl} alt="" className="w-72 h-80 rounded-lg object-cover" crossOrigin="anonymous" />
-            <div className= "text-white w-full p-2 bg-gradient-to-t from-[#454545] to-transparent rounded-lg pt-5 -mt-20">
-                <strong className="text-xl">{data.data.name}</strong>
-                <p className="display-inline">
-                    {data.data.description}
-                </p>
+        <Link to={`/nftPage/${data.tokenId}`} className="nft-card">
+        <img src={data.image} alt={data.name} className="nft-image" />
+        <div className="details">
+            <div className="name">{data.name}</div>
+            <div className="description">{data.description}</div>
+            <div className="actions">
+            {currAddress === data.seller || currAddress === data.owner ? (
+                <button className="owned-button">Owned</button>
+            ) : (
+                <button className="buy-button">Buy</button>
+            )}
             </div>
         </div>
         </Link>
-    )
-}
-
-export default NFTTile;
+    );
+    }

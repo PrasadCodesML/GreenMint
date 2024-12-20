@@ -13,7 +13,7 @@ body {
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat; */
-  background-color: #060507;
+  background-color: black;
   padding-top: 80px; /* Account for the fixed navbar height */
 
   animation: gradientTransform 3s linear infinite;

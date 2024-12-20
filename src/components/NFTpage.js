@@ -48,25 +48,26 @@ async function getNFTData(tokenId) {
 async function buyNFT(tokenId) {
     try {
         const ethers = require("ethers");
-        //After adding your Hardhat network to your metamask, this code will get providers and signers
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-
-        //Pull the deployed contract instance
         let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer);
-        const salePrice = ethers.utils.parseUnits(data.price, 'ether')
-        updateMessage("Buying the NFT... Please Wait (Upto 5 mins)")
-        //run the executeSale function
-        let transaction = await contract.executeSale(tokenId, {value:salePrice});
+
+        const salePrice = ethers.utils.parseUnits(data.price, 'ether');
+        updateMessage("Buying the NFT... Please Wait (Upto 5 mins)");
+
+        let transaction = await contract.executeSale(tokenId, { value: salePrice });
         await transaction.wait();
 
         alert('You successfully bought the NFT!');
         updateMessage("");
-    }
-    catch(e) {
-        alert("Upload Error"+e)
+
+        // Re-fetch data to update owner and seller
+        getNFTData(tokenId);
+    } catch (e) {
+        alert("Upload Error: " + e);
     }
 }
+
 
     const params = useParams();
     const tokenId = params.tokenId;
@@ -90,9 +91,9 @@ async function buyNFT(tokenId) {
                     <div>
                         Price: <span className="">{data.price + " ETH"}</span>
                     </div>
-                    <div>
+                    {/* <div>
                         Owner: <span className="text-sm">{data.owner}</span>
-                    </div>
+                    </div> */}
                     <div>
                         Seller: <span className="text-sm">{data.seller}</span>
                     </div>

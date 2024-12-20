@@ -2,7 +2,6 @@ const { ethers } = require("hardhat");
 const fs = require("fs");
 
 async function main() {
-  // Deploy the NFTMarketplace contract
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
 
@@ -20,15 +19,17 @@ async function main() {
   fs.writeFileSync('./src/Marketplace.json', JSON.stringify(marketplaceData));
   console.log("NFTMarketplace ABI and address saved to ./src/Marketplace.json");
 
-  // Deploy the EcoCoin contract
+  // Deploy EcoCoin contract with a total cap (100 million tokens)
   const EcoCoin = await ethers.getContractFactory("EcoCoin");
-  const ecoCoin = await EcoCoin.deploy(100000000, 50); // Cap: 100M, Block reward: 50
+  const totalSupply = ethers.BigNumber.from("100000000").mul(ethers.BigNumber.from("10").pow(18)); // 100M tokens with 18 decimals
+  const ecoCoin = await EcoCoin.deploy(totalSupply);
   await ecoCoin.deployed();
   console.log("EcoCoin deployed to:", ecoCoin.address);
 
-  // Mint the full initial supply (100 million tokens)
-  await ecoCoin.mintInitialSupply(100000000); // Mint 100M tokens
-  console.log("Minted full initial supply of 100 million tokens to owner");
+  // Mint only 50% of the initial supply to the owner's address
+  const halfSupply = totalSupply.div(2);
+  await ecoCoin.mint(deployer.address, halfSupply); // Mint 50% to the deployer's address
+  console.log("Minted 50% of the total supply to deployer's address");
 
   // Optionally, save EcoCoin contract ABI and address to a file if needed
   const ecoCoinData = {

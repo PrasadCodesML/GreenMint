@@ -93,7 +93,10 @@ function Navbar() {
           Marketplace
         </Link>
         <Link to="/sellNFT" style={location.pathname === "/sellNFT" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
-          My NFTs
+          Upload NFTs
+        </Link>
+        <Link to="/createNFT" style={location.pathname === "/createNFT" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
+          Create NFTs
         </Link>
         <Link to="/addCarbonFootprints" style={location.pathname === "/addCarbonFootprints" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
           Eco Coins

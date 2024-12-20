@@ -14,6 +14,7 @@ import Profile from './components/Profile';
 import NFTPage from './components/NFTpage';
 import AddCarbonFootprints from './components/AddCarbonFootprints';
 import Navbar from './components/Navbar';
+import CreateNFT from './components/CreateNFT';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -21,6 +22,7 @@ root.render(
       <Routes>
         <Route path="/" element={<Marketplace />}/>
         <Route path="/sellNFT" element={<SellNFT />}/> 
+        <Route path="/createNFT" element={<CreateNFT />}/>  
         <Route path="/nftPage/:tokenId" element={<NFTPage />}/>        
         <Route path="/profile" element={<Profile />}/> 
         <Route path="/addCarbonFootprints" element={<AddCarbonFootprints />}/>     

@@ -2,87 +2,78 @@ import Navbar from "./Navbar";
 import NFTTile from "./NFTTile";
 import MarketplaceJSON from "../Marketplace.json";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GetIpfsUrlFromPinata } from "../utils";
+import "./NFTCard.css"; // Import the card design styles
 
 export default function Marketplace() {
-    const sampleData = [
-        {
-        name: "NFT#1",
-        description: "Alchemy's First NFT",
-        website: "http://axieinfinity.io",
-        image: "https://gateway.pinata.cloud/ipfs/QmTsRJX7r5gyubjkdmzFrKQhHv74p5wT9LdeF1m3RTqrE5",
-        price: "0.03ETH",
-        currentlySelling: "True",
-        address: "0xe81Bf5A757CB4f7F82a2F23b1e59bE45c33c5b13",
-        },
-        {
-        name: "NFT#2",
-        description: "Alchemy's Second NFT",
-        website: "http://axieinfinity.io",
-        image: "https://gateway.pinata.cloud/ipfs/QmdhoL9K8my2vi3fej97foiqGmJ389SMs55oC5EdkrxF2M",
-        price: "0.03ETH",
-        currentlySelling: "True",
-        address: "0xe81Bf5A757C4f7F82a2F23b1e59bE45c33c5b13",
-        },
-        {
-        name: "NFT#3",
-        description: "Alchemy's Third NFT",
-        website: "http://axieinfinity.io",
-        image: "https://gateway.pinata.cloud/ipfs/QmTsRJX7r5gyubjkdmzFrKQhHv74p5wT9LdeF1m3RTqrE5",
-        price: "0.03ETH",
-        currentlySelling: "True",
-        address: "0xe81Bf5A757C4f7F82a2F23b1e59bE45c33c5b13",
-        },
-    ];
-    const [data, updateData] = useState(sampleData);
+
+    const [data, updateData] = useState([]);
     const [dataFetched, updateFetched] = useState(false);
+    const [currAddress, updateCurrAddress] = useState("0x");
 
     async function getAllNFTs() {
-        const ethers = require("ethers");
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer);
-        let transaction = await contract.getAllNFTs();
+        try {
+          const ethers = require("ethers");
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          const addr = await signer.getAddress();
+          updateCurrAddress(addr);
+      
+          const contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer);
+          const transaction = await contract.getAllNFTs();
+      
+          console.log("Transaction Data:", transaction); // Debugging log
+      
+          const items = await Promise.all(
+            transaction.map(async (i) => {
+              try {
+                let tokenURI = await contract.tokenURI(i.tokenId);
+                tokenURI = GetIpfsUrlFromPinata(tokenURI);
+                const meta = await axios.get(tokenURI);
+                const price = ethers.utils.formatUnits(i.price.toString(), "ether");
+      
+                return {
+                  price,
+                  tokenId: i.tokenId.toNumber(),
+                  seller: i.seller,
+                  owner: i.owner,
+                  image: meta.data.image,
+                  name: meta.data.name,
+                  description: meta.data.description,
+                };
+              } catch (error) {
+                console.error("Error fetching token data:", error);
+                return null;
+              }
+            })
+          );
+      
+          const validItems = items.filter((item) => item !== null); // Remove any null items
+          console.log("NFT Items:", validItems); // Debugging log
+          updateData(validItems);
+          updateFetched(true);
+        } catch (error) {
+          console.error("Error fetching NFTs:", error);
+        }
+      }
+      
 
-        const items = await Promise.all(
-        transaction.map(async (i) => {
-            var tokenURI = await contract.tokenURI(i.tokenId);
-            tokenURI = GetIpfsUrlFromPinata(tokenURI);
-            let meta = await axios.get(tokenURI);
-            meta = meta.data;
-
-            let price = ethers.utils.formatUnits(i.price.toString(), "ether");
-            let item = {
-            price,
-            tokenId: i.tokenId.toNumber(),
-            seller: i.seller,
-            owner: i.owner,
-            image: meta.image,
-            name: meta.name,
-            description: meta.description,
-            };
-            return item;
-        })
-        );
-
-        updateFetched(true);
-        updateData(items);
-    }
-
-    if (!dataFetched) getAllNFTs();
+    useEffect(() => {
+        if (!dataFetched) getAllNFTs();
+    }, [dataFetched]);
 
     return (
         <div>
         <Navbar />
-        <div className="flex flex-col place-items-center pt-20"> {/* pt-20 ensures spacing for navbar */}
-            <div className="md:text-xl font-bold text-white">Top NFTs</div>
-            <div className="flex mt-5 justify-between flex-wrap max-w-screen-xl text-center">
-            {data.map((value, index) => {
-                return <NFTTile data={value} key={index}></NFTTile>;
-            })}
+        <div className="marketplace-container">
+            <h1 className="title">Top NFTs</h1>
+            <div className="nft-grid">
+            {data.map((value, index) => (
+                <NFTTile data={value} key={index} currAddress={currAddress} />
+            ))}
             </div>
         </div>
         </div>
     );
-}
+    }
