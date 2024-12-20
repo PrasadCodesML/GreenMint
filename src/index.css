@@ -1,30 +1,50 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 body {
   margin: 0;
-  /*font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;*/
-  font-family: 'Open Sans',sans-serif;
-  /*font-family: 'M PLUS 1p', sans-serif;*/
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: url('./bg.png');
-  background-size: 200% 180%;
-  animation-duration: 3s;
-  animation-timing-function: linear;
-  animation-delay: 0s;
-  animation-iteration-count: infinite;
-  animation-direction: normal;
-  animation-fill-mode: none;
-  animation-play-state: running;
-  animation-name: gradientTransform;
-  background-repeat: no-repeat;
+  top: 0;
+  /* background-image: url('./bg.png');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat; */
+  background-color: #060507;
+  padding-top: 80px; /* Account for the fixed navbar height */
+
+  animation: gradientTransform 3s linear infinite;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* {
+  box-sizing: border-box;
+  top: 0;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+ul {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+ul, li, div {
+  margin: 0;
+  padding: 0;
+}
+div, ul, li {
+  z-index: auto; /* Ensure no unexpected z-index is interfering */
 }

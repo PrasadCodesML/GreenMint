@@ -1,5 +1,7 @@
 import logo from '../logo_3.png';
 import fullLogo from '../full_logo.png';
+import styles from './navbar.modules.css';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -10,129 +12,103 @@ import {
 } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
-
 function Navbar() {
-
-const [connected, toggleConnect] = useState(false);
-const location = useLocation();
-const [currAddress, updateAddress] = useState('0x');
-
-async function getAddress() {
-  const ethers = require("ethers");
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const addr = await signer.getAddress();
-  updateAddress(addr);
-}
-
-function updateButton() {
-  const ethereumButton = document.querySelector('.enableEthereumButton');
-  ethereumButton.textContent = "Connected";
-  ethereumButton.classList.remove("hover:bg-blue-70");
-  ethereumButton.classList.remove("bg-blue-500");
-  ethereumButton.classList.add("hover:bg-green-70");
-  ethereumButton.classList.add("bg-green-500");
-}
-
-async function connectWebsite() {
-
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    if(chainId !== '0x5')
-    {
-      //alert('Incorrect network! Switch your metamask network to Rinkeby');
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x5' }],
-     })
-    }  
-    await window.ethereum.request({ method: 'eth_requestAccounts' })
-      .then(() => {
-        updateButton();
-        console.log("here");
-        getAddress();
-        window.location.replace(location.pathname)
-      });
-}
+  const [connected, toggleConnect] = useState(false);
+  const [currAddress, updateAddress] = useState("0x");
+  const location = useLocation();
 
   useEffect(() => {
-    if(window.ethereum == undefined)
-      return;
-    let val = window.ethereum.isConnected();
-    if(val)
-    {
-      console.log("here");
-      getAddress();
-      toggleConnect(val);
-      updateButton();
+    // Restore connection state on component load
+    const savedAddress = localStorage.getItem("connectedAddress");
+    if (savedAddress) {
+      updateAddress(savedAddress);
+      toggleConnect(true);
     }
+  }, []);
 
-    window.ethereum.on('accountsChanged', function(accounts){
-      window.location.replace(location.pathname)
-    })
-  });
+  async function connectWebsite() {
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask is not installed!");
+        return;
+      }
 
-    return (
-      <div className="">
-        <nav className="w-screen">
-          <ul className='flex items-end justify-between py-3 bg-transparent text-white pr-5'>
-          <li className='flex items-end ml-5 pb-2'>
-            <Link to="/">
-            <img src={fullLogo} alt="" width={120} height={120} className="inline-block -mt-2"/>
-            <div className='inline-block font-bold text-xl ml-2'>
-              NFT Marketplace
-            </div>
-            </Link>
-          </li>
-          <li className='w-2/6'>
-            <ul className='lg:flex justify-between font-bold mr-10 text-lg'>
-              {location.pathname === "/" ? 
-              <li className='border-b-2 hover:pb-0 p-2'>
-                <Link to="/">Marketplace</Link>
-              </li>
-              :
-              <li className='hover:border-b-2 hover:pb-0 p-2'>
-                <Link to="/">Marketplace</Link>
-              </li>              
-              }
-              {location.pathname === "/sellNFT" ? 
-              <li className='border-b-2 hover:pb-0 p-2'>
-                <Link to="/sellNFT">List My NFT</Link>
-              </li>
-              :
-              <li className='hover:border-b-2 hover:pb-0 p-2'>
-                <Link to="/sellNFT">List My NFT</Link>
-              </li>              
-              }    
-              {location.pathname === "/addCarbonFootprints" ? 
-              <li className='border-b-2 hover:pb-0 p-2'>
-                <Link to="/addCarbonFootprints">Add Carbon Footprints</Link>
-              </li>
-              :
-              <li className='hover:border-b-2 hover:pb-0 p-2'>
-                <Link to="/addCarbonFootprints">Add Carbon Footprints</Link>
-              </li>              
-              }            
-              {location.pathname === "/profile" ? 
-              <li className='border-b-2 hover:pb-0 p-2'>
-                <Link to="/profile">Profile</Link>
-              </li>
-              :
-              <li className='hover:border-b-2 hover:pb-0 p-2'>
-                <Link to="/profile">Profile</Link>
-              </li>              
-              }  
-              <li>
-                <button className="enableEthereumButton bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={connectWebsite}>{connected? "Connected":"Connect Wallet"}</button>
-              </li>
-            </ul>
-          </li>
-          </ul>
-        </nav>
-        <div className='text-white text-bold text-right mr-10 text-sm'>
-          {currAddress !== "0x" ? "Connected to":"Not Connected. Please login to view NFTs"} {currAddress !== "0x" ? (currAddress.substring(0,15)+'...'):""}
-        </div>
-      </div>
-    );
+      const chainId = await window.ethereum.request({ method: "eth_chainId" });
+      if (chainId !== "0x5") {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x5" }],
+        });
+      }
+
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const account = accounts[0];
+
+      // Update state and persist to localStorage
+      updateAddress(account);
+      localStorage.setItem("connectedAddress", account);
+      toggleConnect(true);
+    } catch (error) {
+      console.error("Error connecting to wallet:", error);
+    }
   }
 
-  export default Navbar;
+  const navContainer = {
+    height: "100px",
+    backgroundColor: "#ECD60D",
+    width: "100%",
+    position: "fixed",
+    top: 0,
+    padding: "0 30px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    zIndex: 9999,
+    borderRadius: "0 0 20px 20px",
+  };
+
+  const buttonStyle = {
+    padding: "12px 20px",
+    backgroundColor: connected ? "#16a34a" : "#2563eb",
+    color: "#ffffff",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "16px",
+  };
+
+  return (
+    <div style={navContainer}>
+      {/* Logo */}
+      <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+        <img src={fullLogo} alt="Logo" width={50} />
+        <span style={{ fontWeight: "bold", color: "black", fontSize: "28px" }}>GreenMint NFT</span>
+      </Link>
+
+      {/* Navigation Links */}
+      <div style={{ display: "flex", alignItems: "center", gap: "30px" }}>
+        <Link to="/" style={location.pathname === "/" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
+          Marketplace
+        </Link>
+        <Link to="/sellNFT" style={location.pathname === "/sellNFT" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
+          My NFTs
+        </Link>
+        <Link to="/addCarbonFootprints" style={location.pathname === "/addCarbonFootprints" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
+          Eco Coins
+        </Link>
+        <Link to="/profile" style={location.pathname === "/profile" ? { color: "white", backgroundColor: "#060507", padding: "12px 20px", borderRadius: "6px" } : { padding: "12px 20px", textDecoration: "none", color: "#333" }}>
+          Profile
+        </Link>
+      </div>
+
+      {/* Connect Wallet Button */}
+      <button className="enableEthereumButton" style={buttonStyle} onClick={connectWebsite}>
+        {connected ? "Connected" : "Connect Wallet"}
+      </button>
+    </div>
+  );
+}
+
+export default Navbar;

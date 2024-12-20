@@ -13,7 +13,7 @@ import Marketplace from './components/Marketplace';
 import Profile from './components/Profile';
 import NFTPage from './components/NFTpage';
 import AddCarbonFootprints from './components/AddCarbonFootprints';
-
+import Navbar from './components/Navbar';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
