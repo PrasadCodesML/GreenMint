@@ -92,5 +92,33 @@ def predict():
         app.logger.error("Error in prediction process: %s", str(e))
         return jsonify({"error": str(e)}), 400
 
+user_profiles = {'0x1322F108EF41A74440a884D414715c000696e04A': {"total_footprint": 0}}
+
+
+@app.route("/get-profile", methods=["GET"])
+def get_profile():
+    address = request.args.get("address")
+    if not address:
+        return jsonify({"error": "Address is required"}), 400
+
+    # Retrieve user data or default to {"total_footprint": 0}
+    user_data = user_profiles.get(address, {"total_footprint": 0})
+    return jsonify(user_data)
+
+
+@app.route("/user/update-footprint", methods=["POST"])
+def update_footprint():
+    data = request.json
+    address = data.get("address")
+    total_footprint = data.get("total_footprint")
+
+    if not address or total_footprint is None:
+        return jsonify({"error": "Address and total footprint are required"}), 400
+
+    # Update the user's footprint in the dictionary
+    user_profiles[address] = {"total_footprint": total_footprint}
+    return jsonify({"message": "Footprint updated successfully"})
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

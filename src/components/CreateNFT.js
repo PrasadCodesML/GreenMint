@@ -138,7 +138,7 @@ export default function CreateNFT() {
         <div className="flex flex-col place-items-center mt-10" id="nftForm">
             <form className=" shadow-md rounded px-8 pt-4 pb-8 mb-4" style={{width : "80%", backgroundColor:"#f0f0f0"}} >
             <h3 className="text-center font-bold text-black-500 mb-8">
-                Create an NFT with your collected Footprints
+                Create an NFT with AI
             </h3>
             {/* AI Prompt Input */}
             <div className="mb-4">
