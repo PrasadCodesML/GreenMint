@@ -37,53 +37,18 @@ function App() {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
+        // Log the inputted data
+        console.log("Form Data Submitted:", formData);
+    
         try {
-            const signer = provider.getSigner();
-            const userAddress = await signer.getAddress(); // Get the wallet address
-            console.log("Connected Wallet Address:", userAddress);
-    
-            console.log("Form Data Submitted:", formData);
-    
-            // Calculate the new footprint
-            const response = await axios.post(
-                "http://192.168.182.61:5000/predict",
-                formData,
-                {
-                    headers: { "Content-Type": "application/json" },
+            const response = await axios.post("http://192.168.0.121:5000/predict", formData, {
+                headers: {
+                    "Content-Type": "application/json"
                 }
-            );
-            const newFootprint = response.data.carbon_footprint;
-            console.log("New Carbon Footprint:", newFootprint);
-    
-            // Fetch the current balance using the wallet address
-            const userResponse = await axios.get(
-                `http://192.168.182.61:5000/get-profile?address=${userAddress}`,
-                {
-                    headers: { "Content-Type": "application/json" },
-                }
-            );
-            const currentBalance = userResponse.data?.total_footprint || 0;
-            console.log("Current Footprint Balance:", currentBalance);
-    
-            // Update the total footprint balance
-            const updatedBalance = currentBalance + newFootprint;
-    
-            // Send the updated balance back to the backend
-            await axios.post(
-                "http://192.168.182.61:5000/user/update-footprint",
-                { address: userAddress, total_footprint: updatedBalance },
-                {
-                    headers: { "Content-Type": "application/json" },
-                }
-            );
-    
-            setPrediction(newFootprint); // Update the UI
-            console.log("Total Footprint Updated:", updatedBalance);
+            });
+            setPrediction(response.data.carbon_footprint);
         } catch (error) {
-            console.error(
-                "Error updating total footprint:",
-                error.response ? error.response.data : error
-            );
+            console.error("Error making prediction:", error.response ? error.response.data : error);
         }
     };
     const [formParams, updateFormParams] = useState({

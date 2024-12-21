@@ -1,5 +1,5 @@
+import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
-import { useEffect, useState } from "react";
 import MarketplaceJSON from "../Marketplace.json";
 import axios from "axios";
 import "./NFTCard.css";
@@ -7,7 +7,8 @@ import "./NFTCard.css";
 export default function TradeNFTs() {
     const [data, updateData] = useState([]);
     const [dataFetched, updateFetched] = useState(false);
-    const [totalPrice, updateTotalPrice] = useState(0);
+    const [address, updateAddress] = useState("0x");
+    const [totalPrice, updateTotalPrice] = useState("0");
 
     // Predefined demo offers
     const offers = [
@@ -20,7 +21,7 @@ export default function TradeNFTs() {
         { id: 7, reward: "Exclusive access to premium events", threshold: 12 },
         { id: 8, reward: "Free gym membership for a year", threshold: 7 },
         { id: 9, reward: "Priority customer support", threshold: 0.4 },
-        { id: 10, reward: "Early access to new product launches", threshold: 18 }
+        { id: 10, reward: "Early access to new product launches", threshold: 18 },
     ];
 
     async function getNFTData() {
@@ -28,11 +29,19 @@ export default function TradeNFTs() {
             const ethers = require("ethers");
             let sumPrice = 0;
 
+            // Initialize provider and signer
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
+
+            // Fetch the connected wallet address
+            const addr = await signer.getAddress();
+            updateAddress(addr);
+
+            // Fetch the contract instance
             const contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer);
 
-            const transaction = await contract.getAllNFTs();
+            // Get the user's NFTs
+            const transaction = await contract.getMyNFTs();
 
             const items = await Promise.all(
                 transaction.map(async (i) => {
@@ -46,7 +55,7 @@ export default function TradeNFTs() {
                         price,
                         tokenId: i.tokenId.toNumber(),
                         seller: i.seller,
-                        owner: i.seller,
+                        owner: i.owner,
                         image: meta.image,
                         name: meta.name,
                         description: meta.description,
@@ -56,7 +65,7 @@ export default function TradeNFTs() {
 
             updateData(items);
             updateFetched(true);
-            updateTotalPrice(sumPrice);
+            updateTotalPrice(sumPrice.toPrecision(3));
         } catch (error) {
             console.error("Error fetching NFT data:", error);
         }
@@ -73,18 +82,23 @@ export default function TradeNFTs() {
             <Navbar />
             <div className="trade-content">
                 <div className="text-center mt-11 md:text-2xl text-white">
-                    <h2 className="font-bold mb-5">Trade NFTs</h2>
+                    <h2 className="font-bold mb-5">Your NFTs</h2>
+                    <p className="text-gray-400">Wallet Address: {address}</p>
                 </div>
+
                 <div className="nft-summary flex justify-center mt-10 md:text-2xl text-white">
                     <div>
-                        <h2 className="font-bold">Total NFTs</h2>
+                        <h2 className="font-bold">Total NFTs Owned</h2>
                         <span>{data.length}</span>
                     </div>
                     <div className="ml-20">
                         <h2 className="font-bold">Total Value</h2>
-                        <span>{totalPrice.toFixed(2)} ETH</span>
+                        <span>{totalPrice} ETH</span>
                     </div>
                 </div>
+
+                
+
                 <div className="offers-section text-center mt-10 text-white">
                     <h3 className="font-bold mb-5">Available Offers</h3>
                     <div className="offers-grid flex flex-col items-center">
@@ -104,20 +118,19 @@ export default function TradeNFTs() {
                                     <p className="offer-price text-gray-400">Price: {offer.threshold} ETH</p>
                                 </div>
                                 <button
-                                    disabled={totalPrice < offer.threshold}
+                                    disabled={Number(totalPrice) < offer.threshold}
                                     className={`offer-button p-2 rounded-md ${
-                                        totalPrice >= offer.threshold
+                                        Number(totalPrice) >= offer.threshold
                                             ? "bg-yellow-500 text-black"
                                             : "bg-gray-500 text-gray-700 cursor-not-allowed"
                                     }`}
                                 >
-                                    {totalPrice >= offer.threshold ? "Buy" : "Buy (Insufficient Funds)"}
+                                    {Number(totalPrice) >= offer.threshold ? "Claim" : "Insufficient Balance"}
                                 </button>
                             </div>
                         ))}
                     </div>
                 </div>
-                
             </div>
         </div>
     );
