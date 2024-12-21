@@ -97,7 +97,7 @@ function App() {
     const [message, updateMessage] = useState("");
     const ethers = require("ethers");
 
-    const HUGGINGFACE_API_KEY = "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";
+    const HUGGINGFACE_API_KEY = "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";
 
     async function disableButton() {
         const listButton = document.getElementById("list-button");
@@ -152,6 +152,7 @@ function App() {
 
     // Upload metadata to IPFS
     async function uploadMetadataToIPFS() {
+        console.log(formParams)
         const { name, description, price } = formParams;
         if (!name || !description || !price || !fileURL) {
         updateMessage("Please fill all the fields and generate an image!");
@@ -252,10 +253,10 @@ function App() {
     }
     
     // Example usage:
-    const data = { 'CarbonEmission': 1500 };
-    const name = "John Doe";
-    const nftPrompt = generateNftPrompt(data, name);
-    console.log(nftPrompt);
+    // const data = { 'CarbonEmission': 1500 };
+    // const name = "John Doe";
+    // const nftPrompt = generateNftPrompt(data, name);
+    // console.log(nftPrompt);
     
     return (
         <div style={{ fontFamily: "Arial, sans-serif", backgroundColor: "#000", color: "#fff", minHeight: "100vh" }}>
@@ -464,6 +465,23 @@ function App() {
                 value={formParams.description}
                 onChange={(e) =>
                     updateFormParams({ ...formParams, description: e.target.value })
+                }
+                />
+            </div>
+            <div className="mb-6">
+                <label
+                className="block text-black-500 text-sm font-bold mb-2"
+                htmlFor="custom"
+                >
+                Price (in sol)
+                </label>
+                <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                type="number"
+                placeholder="Min 0.01 ETH"
+                value={formParams.price}
+                onChange={(e) =>
+                    updateFormParams({ ...formParams, price: e.target.value })
                 }
                 />
             </div>

@@ -17,7 +17,7 @@ module.exports = {
       url: "http://127.0.0.1:7545", // Ganache default RPC server
       chainId: 1337, // Match the Hardhat chain ID or set as per your Ganache setup
       accounts: [
-        "0xe3df8a6ff3e8183b71146bde8b42fa285a0edcc7850002bd6cd6eb2492794dcf",
+        "0xaf83cb31308c4b1c4d6c3dd6ff07551988fcd6b827123dd4ae42470c5aa1e630",
         // Add more private keys as needed
       ],
     },

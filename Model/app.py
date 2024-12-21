@@ -92,7 +92,7 @@ def predict():
         app.logger.error("Error in prediction process: %s", str(e))
         return jsonify({"error": str(e)}), 400
 
-user_profiles = {'0x1322F108EF41A74440a884D414715c000696e04A': {"total_footprint": 0}}
+user_profiles = {'0x0f1afed31BD8cD72751B2374Fe8f06C23af98365': {"total_footprint": 0}}
 
 
 @app.route("/get-profile", methods=["GET"])

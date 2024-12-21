@@ -2,7 +2,7 @@ import Navbar from "./Navbar";
 import { useEffect, useState } from "react";
 import MarketplaceJSON from "../Marketplace.json";
 import axios from "axios";
-import NFTTile from "./NFTTile";
+import NFTTile2 from "./NFTTile2";
 import "./NFTCard.css"; // Import the card styles
 
 export default function Profile() {
@@ -88,7 +88,7 @@ export default function Profile() {
                     <h2 className="font-bold mb-5">Your NFTs</h2>
                     <div className="nft-grid">
                         {data.map((value, index) => (
-                            <NFTTile data={value} key={index} />
+                            <NFTTile2 data={value} key={index} />
                         ))}
                     </div>
                     {data.length === 0 && (
