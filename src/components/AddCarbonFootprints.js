@@ -394,19 +394,20 @@ function App() {
             </div>
             <div>
         
-        <div className="flex flex-col place-items-center mt-10 " id="nftForm">
+        <div className="flex flex-col text-black-500 place-items-center mt-10 " id="nftForm">
             <form className=" shadow-md rounded px-8 pt-4 pb-8 mb-4" style={{width : "80%", backgroundColor:"#f0f0f0"}} >
             
             {/* AI Prompt Input */}
-            <div className="mb-4">
+            <div className="mb-4 text-black-500 ">
             <label
                 className="block text-black-500 text-sm font-bold mb-2"
                 htmlFor="prompt"
+                style={{color:"black"}}
                 >
                 Enter Keyword
                 </label>
                 <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow appearance-none text-black-500  border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="prompt"
                 type="text"
                 placeholder={prediction}
@@ -435,6 +436,7 @@ function App() {
                 <label
                 className="block text-black-500 text-sm font-bold mb-2"
                 htmlFor="name"
+                style={{color:"black"}}
                 >
                 NFT Name
                 </label>
@@ -453,6 +455,7 @@ function App() {
                 <label
                 className="block text-black-500 text-sm font-bold mb-2"
                 htmlFor="description"
+                style={{color:"black"}}
                 >
                 NFT Description
                 </label>
@@ -472,6 +475,7 @@ function App() {
                 <label
                 className="block text-black-500 text-sm font-bold mb-2"
                 htmlFor="custom"
+                style={{color:"black"}}
                 >
                 Price (in sol)
                 </label>
@@ -489,6 +493,7 @@ function App() {
                 <label
                 className="block text-black-500 text-sm font-bold mb-2"
                 htmlFor="price"
+                style={{color:"black"}}
                 >
                 Price (in ETH)
                 </label>

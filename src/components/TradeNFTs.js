@@ -14,12 +14,12 @@ export default function TradeNFTs() {
         { id: 1, reward: "2% lower interest on home loan", threshold: 5 },
         { id: 2, reward: "10% cashback on travel expenses", threshold: 10 },
         { id: 3, reward: "Free credit score check for 1 year", threshold: 2 },
-        { id: 4, reward: "15% off on online shopping", threshold: 8 },
-        { id: 5, reward: "Free movie tickets every month", threshold: 15 },
+        { id: 4, reward: "15% off on online shopping", threshold: 0.01 },
+        { id: 5, reward: "Free movie tickets every month", threshold: 0.1 },
         { id: 6, reward: "20% discount on dining", threshold: 3 },
         { id: 7, reward: "Exclusive access to premium events", threshold: 12 },
         { id: 8, reward: "Free gym membership for a year", threshold: 7 },
-        { id: 9, reward: "Priority customer support", threshold: 1 },
+        { id: 9, reward: "Priority customer support", threshold: 0.4 },
         { id: 10, reward: "Early access to new product launches", threshold: 18 }
     ];
 
@@ -107,7 +107,7 @@ export default function TradeNFTs() {
                                     disabled={totalPrice < offer.threshold}
                                     className={`offer-button p-2 rounded-md ${
                                         totalPrice >= offer.threshold
-                                            ? "bg-blue-500 text-white"
+                                            ? "bg-yellow-500 text-black"
                                             : "bg-gray-500 text-gray-700 cursor-not-allowed"
                                     }`}
                                 >
